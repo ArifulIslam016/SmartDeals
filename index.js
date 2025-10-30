@@ -26,16 +26,42 @@ async function run() {
         await client.connect();
         const Smartdb=client.db("SmartDealsDB")
         const ProductsCollections=Smartdb.collection("Products")
-
+        const BidsCollections=Smartdb.collection('Bids')
         // Create Method
         app.post('/products',async(req,res)=>{
             const newProduct=req.body;
             const result=await ProductsCollections.insertOne(newProduct)
             res.send(result)
         })
+        //Create a bids
+         app.post('/bids',async(req,res)=>{
+            const newBid=req.body;
+           const result=await BidsCollections.insertOne(newBid);
+           res.send(result)
+         })
         // Get Products section
         app.get('/products',async(req,res)=>{
-            const cursor=ProductsCollections.find();
+            // const cursor=ProductsCollections.find().sort({price_min:-1});    
+            const Email=req.query.email;
+            const quary={};
+            if(Email){
+                quary.email=Email
+            }
+
+
+            const cursor=ProductsCollections.find(quary);
+            const result=await cursor.toArray()
+            res.send(result)
+        })
+        // get Bids details
+
+        app.get('/bids',async(req,res)=>{
+            const email=req.query.email;
+            const quary={}
+            if(email){
+                quary.buyer_email=email;
+            }
+            const cursor=BidsCollections.find(quary);
             const result=await cursor.toArray()
             res.send(result)
         })
