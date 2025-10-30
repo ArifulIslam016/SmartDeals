@@ -72,6 +72,13 @@ async function run() {
             const result=await ProductsCollections.findOne(quary)
             res.send(result)
         })
+        // get single Bids via id
+        app.get('/bids/:id',async(req,res)=>{
+            const id=req.params.id;
+            const quary={_id:new ObjectId(id)}
+            const result=await BidsCollections.findOne(quary)
+            res.send(result)
+        })
         // Upadate function here
         app.patch('/products/:id',async(req,res)=>{
             const id=req.params.id;
@@ -94,6 +101,13 @@ async function run() {
             const quary={_id:new ObjectId(id)}
             const result=await ProductsCollections.deleteOne(quary)
             res.send(result)
+        })
+        //Delete a bids
+        app.delete('/bids/:id',(req,res)=>{
+            const id=req.params.id;
+            const quary={_id:new ObjectId(id)}
+            const result=BidsCollections.deleteOne(quary)
+             res.send(result)
         })
 
         // await client.db('admin').command({ping:1})
