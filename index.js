@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port=process.env.PORT||3000
 const app=express();
 // MongoDb Url 
@@ -33,9 +33,41 @@ async function run() {
             const result=await ProductsCollections.insertOne(newProduct)
             res.send(result)
         })
+        // Get Products section
+        app.get('/products',async(req,res)=>{
+            const cursor=ProductsCollections.find();
+            const result=await cursor.toArray()
+            res.send(result)
+        })
+        // get single Products via id
+        app.get("/products/:id",async(req,res)=>{
+            const id= req.params.id;
+            const quary={_id:new ObjectId(id)}
+            const result=await ProductsCollections.findOne(quary)
+            res.send(result)
+        })
+        // Upadate function here
+        app.patch('/products/:id',async(req,res)=>{
+            const id=req.params.id;
+            const quary={_id:new ObjectId(id)}
+            const updatedProduct=req.body;
+            const update={
+                $set:{
+                   name: updatedProduct.name,
+                   price:updatedProduct.price
+
+                }
+            }
+            const result= await ProductsCollections.updateOne(quary,update)
+            res.send(result)
+
+        })
         // Delete Method
         app.delete('/products/:id',async(req,res)=>{
             const id=req.params.id;
+            const quary={_id:new ObjectId(id)}
+            const result=await ProductsCollections.deleteOne(quary)
+            res.send(result)
         })
 
         // await client.db('admin').command({ping:1})
