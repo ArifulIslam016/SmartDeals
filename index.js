@@ -45,8 +45,8 @@ const verifyFirebaseAuthorization=async(req,res,next)=>{
     return res.send({message:"Un Authorized acess"})
   }
   try{
-const result=await admin.auth().verifyIdToken(tocken)
-    console.log(result)
+const decode=await admin.auth().verifyIdToken(tocken)
+   req.user_email_authorised=decode.email;
      next()
   }catch{
     res.status(401).send({message:"Un authorized access"})
@@ -110,6 +110,9 @@ async function run() {
       const email = req.query.email;
       const quary = {};
       if (email) {
+        if(email!==req.user_email_authorised){
+          return res.status(403).send({message:"Forbidden access"})
+        }
         quary.buyer_email = email;
       }
       const cursor = BidsCollections.find(quary);
@@ -117,7 +120,7 @@ async function run() {
       res.send(result);
     });
     // get single Products via id
-    app.get("/products/:id", async (req, res) => {
+    app.get("/products/:id",verifyFirebaseAuthorization, async (req, res) => {
       const id = req.params.id;
       const quary = { _id: new ObjectId(id) };
       const result = await ProductsCollections.findOne(quary);
