@@ -2,7 +2,15 @@ const express = require("express");
 const cors = require("cors");
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const admin = require("firebase-admin");
 const port = process.env.PORT || 3000;
+
+const serviceAccount = require("./smart-deals-firebaseAuthoraization-Code.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
 const app = express();
 // MongoDb Url
 const uri =
@@ -24,10 +32,10 @@ app.get("/", (req, res) => {
 });
 
 const logger=(req,res,next)=>{
-  console.log("this is a middleware and calling next")
+  // console.log("this is a middleware and calling next")
   next()
 }
-const verifyFirebaseAuthorization=(req,res,next)=>{
+const verifyFirebaseAuthorization=async(req,res,next)=>{
   const authorization=req.headers?.authorization;
   if(!authorization){
     return res.status(401).send({message:"UnAuthorized access"})
@@ -36,7 +44,14 @@ const verifyFirebaseAuthorization=(req,res,next)=>{
   if(!tocken){
     return res.send({message:"Un Authorized acess"})
   }
-  next()
+  try{
+const result=await admin.auth().verifyIdToken(tocken)
+    console.log(result)
+     next()
+  }catch{
+    res.status(401).send({message:"Un authorized access"})
+  }
+ 
 }
 async function run() {
   try {
@@ -92,7 +107,6 @@ async function run() {
     // get Bids details
 
     app.get("/bids",logger, verifyFirebaseAuthorization,async (req, res) => {
-      console.log("Auothorization in server:", req.headers.authorization)
       const email = req.query.email;
       const quary = {};
       if (email) {
