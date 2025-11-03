@@ -23,6 +23,21 @@ app.get("/", (req, res) => {
   res.send("This Server is initilized");
 });
 
+const logger=(req,res,next)=>{
+  console.log("this is a middleware and calling next")
+  next()
+}
+const verifyFirebaseAuthorization=(req,res,next)=>{
+  const authorization=req.headers?.authorization;
+  if(!authorization){
+    return res.status(401).send({message:"UnAuthorized access"})
+  }
+  const tocken=authorization.split(" ")[1]
+  if(!tocken){
+    return res.send({message:"Un Authorized acess"})
+  }
+  next()
+}
 async function run() {
   try {
     await client.connect();
@@ -76,7 +91,8 @@ async function run() {
     })
     // get Bids details
 
-    app.get("/bids", async (req, res) => {
+    app.get("/bids",logger, verifyFirebaseAuthorization,async (req, res) => {
+      console.log("Auothorization in server:", req.headers.authorization)
       const email = req.query.email;
       const quary = {};
       if (email) {
