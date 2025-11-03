@@ -128,10 +128,10 @@ async function run() {
       res.send(result);
     });
     //Delete a bids
-    app.delete("/bids/:id", (req, res) => {
+    app.delete("/bids/:id",async (req, res) => {
       const id = req.params.id;
       const quary = { _id: new ObjectId(id) };
-      const result = BidsCollections.deleteOne(quary);
+      const result =await BidsCollections.deleteOne(quary);
       res.send(result);
     });
 
