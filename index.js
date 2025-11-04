@@ -3,6 +3,8 @@ const cors = require("cors");
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const admin = require("firebase-admin");
+const jwt = require('jsonwebtoken');
+
 const port = process.env.PORT || 3000;
 
 const serviceAccount = require("./smart-deals-firebaseAuthoraization-Code.json");
@@ -60,6 +62,14 @@ async function run() {
     const ProductsCollections = Smartdb.collection("Products");
     const BidsCollections = Smartdb.collection("Bids");
     const UserCollections = Smartdb.collection("User");
+
+    // Jwt Webtoken related apis
+  app.post('/token',(req,res)=>{
+    const Token=  jwt.sign({
+  email: req.body.email
+}, process.env.VERIFICATION_TOKEN, { expiresIn: '5d' });
+res.send({Token})
+  })
 
     // Create Method
     app.post("/products", async (req, res) => {
