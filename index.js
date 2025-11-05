@@ -130,7 +130,7 @@ res.send({Token})
       res.send(result);
     });
     // get single Products via id
-    app.get("/products/:id",verifyFirebaseAuthorization, async (req, res) => {
+    app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
       const quary = { _id: new ObjectId(id) };
       const result = await ProductsCollections.findOne(quary);
@@ -144,7 +144,7 @@ res.send({Token})
       res.send(result);
     });
     // Get some bids viya porduct
-    app.get('/products/bids/:productId',async(req,res)=>{
+    app.get('/products/bids/:productId',verifyFirebaseAuthorization,async(req,res)=>{
         const productid=req.params.productId
         const cursor=BidsCollections.find({product:productid}).sort({bid_price:-1})
         const result=await cursor.toArray()
