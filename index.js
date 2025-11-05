@@ -39,6 +39,7 @@ const logger=(req,res,next)=>{
 }
 const verifyFirebaseAuthorization=async(req,res,next)=>{
   const authorization=req.headers?.authorization;
+  
   if(!authorization){
     return res.status(401).send({message:"UnAuthorized access"})
   }
@@ -72,7 +73,7 @@ res.send({Token})
   })
 
     // Create Method
-    app.post("/products", async (req, res) => {
+    app.post("/products",verifyFirebaseAuthorization, async (req, res) => {
       const newProduct = req.body;
       const result = await ProductsCollections.insertOne(newProduct);
       res.send(result);
